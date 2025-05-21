@@ -6,7 +6,7 @@ app = FastAPI()
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request, exc: RequestValidationError):
     errors = []
     for error in exc.errors():
         if error["type"] == "missing":
@@ -24,6 +24,14 @@ async def validation_exception_handler(request, exc):
             errors.append(
                 f"O campo '{field}' deve ter no máximo {max_length} caracteres"
             )
+        elif error["type"] == "string_pattern_mismatch":
+            field = error["loc"][-1]
+            if field == "email":
+                errors.append(
+                    "Email inválido. Use um formato válido como: exemplo@email.com"
+                )
+            else:
+                errors.append(error["msg"])
         elif error["type"] == "value_error.date.format":
             field = error["loc"][-1]
             errors.append(f"O campo '{field}' deve estar no formato dd/mm/yyyy")

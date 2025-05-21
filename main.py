@@ -29,7 +29,7 @@ def read_root():
 def login(request: RequestLogin):
     try:
         # Aqui você pode adicionar sua lógica de autenticação
-        if request.username == "testando" and request.password == "testando":
+        if request.nome == "testando" and request.senha == "testando":
             return returnStatus(200, True, "Login realizado com sucesso")
         else:
             return returnStatus(401, False, "Usuário ou senha inválidos")
@@ -42,7 +42,13 @@ def login(request: RequestLogin):
 
 @app.post("/register")
 def register(request: RequestRegister):
-    return returnStatus(200, True, "Registro realizado com sucesso")
+    try:
+        print(f"Request: {request}")
+        return returnStatus(200, True, "Registro realizado com sucesso")
+    except ValidationError as e:
+        return returnStatus(400, False, str(e))
+    except Exception as e:
+        return returnStatus(500, False, f"Erro interno do servidor: {str(e)}")
 
 
 if __name__ == "__main__":
