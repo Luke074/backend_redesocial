@@ -5,6 +5,11 @@ from fastapi import FastAPI, HTTPException
 
 # Model
 from model.response import returnStatus
+from db.connection import (
+    verifica_conexao_mongo,
+    verifica_conexao_sqlite,
+    cria_banco_de_dados,
+)
 
 # Interfaces
 from interface.RequestLogin import RequestLogin
@@ -51,5 +56,11 @@ def register(request: RequestRegister):
         return returnStatus(500, False, f"Erro interno do servidor: {str(e)}")
 
 
+# @app.get("/conexao")
+# def conexao():
+#     return verifica_conexao_sqlite()
+
+
 if __name__ == "__main__":
+    cria_banco_de_dados()
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -3,3 +3,5 @@ __pycache__/
 .env
 model/__pycache__/
 interface/__pycache__/
+db/__pycache__/
+db/rede_social.db
