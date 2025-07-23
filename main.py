@@ -1,66 +1,15 @@
 import uvicorn
-
-# FastAPI
-from fastapi import FastAPI, HTTPException
-
-# Model
-from model.response import returnStatus
-from db.connection import (
-    verifica_conexao_mongo,
-    verifica_conexao_sqlite,
-    cria_banco_de_dados,
-)
-
-# Interfaces
-from interface.RequestLogin import RequestLogin
-from interface.RequestRegister import RequestRegister
-
-# Pydantic
-from pydantic import ValidationError
-from fastapi.exceptions import RequestValidationError
-from model.validation_exception import validation_exception_handler
-
-app = FastAPI()
-
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
+from fastapi import FastAPI
+from db.postegres import init_db
+from db.mongo import mongo_db
 
 
-@app.get("/")
-def read_root():
-    return returnStatus(200, True, "Hello World")
+app= FastAPI()
 
-
-@app.post("/login")
-def login(request: RequestLogin):
-    try:
-        # Aqui você pode adicionar sua lógica de autenticação
-        if request.nome == "testando" and request.senha == "testando":
-            return returnStatus(200, True, "Login realizado com sucesso")
-        else:
-            return returnStatus(401, False, "Usuário ou senha inválidos")
-
-    except ValidationError as e:
-        return returnStatus(400, False, str(e))
-    except Exception as e:
-        return returnStatus(500, False, f"Erro interno do servidor: {str(e)}")
-
-
-@app.post("/register")
-def register(request: RequestRegister):
-    try:
-        print(f"Request: {request}")
-        return returnStatus(200, True, "Registro realizado com sucesso")
-    except ValidationError as e:
-        return returnStatus(400, False, str(e))
-    except Exception as e:
-        return returnStatus(500, False, f"Erro interno do servidor: {str(e)}")
-
-
-# @app.get("/conexao")
-# def conexao():
-#     return verifica_conexao_sqlite()
-
+@app.get("/", methods=["GET","POST","PUT","DELETE"])
+def root():
+    init_db()
+    return {"message": "Hello World"}
 
 if __name__ == "__main__":
-    cria_banco_de_dados()
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
